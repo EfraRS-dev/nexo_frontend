@@ -1,26 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Brand palette — adjust to restaurant identity */
+  --color-brand: oklch(52% 0.19 150);           /* emerald-ish green */
+  --color-brand-hover: oklch(46% 0.19 150);
+  --color-brand-foreground: oklch(99% 0 0);
+
+  /* Surfaces */
+  --color-surface: oklch(99% 0 0);
+  --color-surface-raised: oklch(100% 0 0);
+  --color-surface-muted: oklch(96% 0.004 240);
+  --color-border: oklch(90% 0.004 240);
+
+  /* Text */
+  --color-text: oklch(14% 0 0);
+  --color-text-muted: oklch(52% 0.008 240);
+
+  /* Status colors */
+  --color-status-pendiente: oklch(72% 0.15 80);
+  --color-status-confirmado: oklch(60% 0.14 230);
+  --color-status-pagado: oklch(55% 0.16 150);
+  --color-status-preparando: oklch(65% 0.17 55);
+  --color-status-en-camino: oklch(55% 0.18 270);
+  --color-status-entregado: oklch(50% 0.15 150);
+
+  /* Sidebar */
+  --color-sidebar-bg: oklch(16% 0.01 240);
+  --color-sidebar-text: oklch(84% 0.005 240);
+  --color-sidebar-active: oklch(52% 0.19 150);
+  --color-sidebar-hover: oklch(22% 0.01 240);
+
+  /* Spacing */
+  --spacing-page: 1.5rem;
+
+  /* Radius */
+  --radius-card: 0.75rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
