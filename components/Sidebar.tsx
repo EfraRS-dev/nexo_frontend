@@ -20,7 +20,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="flex h-screen w-56 flex-col bg-(--color-sidebar-bg) text-(--color-sidebar-text)">
+    <aside className="sticky top-0 self-start flex h-screen w-56 flex-col bg-(--color-sidebar-bg) text-(--color-sidebar-text)">
       {/* Brand */}
       <div className="flex h-14 items-center px-5 border-b border-white/10">
         <span className="text-lg font-bold tracking-tight text-white">

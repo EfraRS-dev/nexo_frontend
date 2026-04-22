@@ -16,10 +16,10 @@ export default function AdminLayout({
 }) {
   return (
     <AuthGuard>
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen items-start">
         <Sidebar />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <div className="flex flex-1 flex-col">
+          <main className="flex-1 p-6">{children}</main>
         </div>
       </div>
     </AuthGuard>

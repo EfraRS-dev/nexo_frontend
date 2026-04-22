@@ -24,11 +24,11 @@ export default function LoginForm() {
       if (err instanceof ApiError) {
         setError(
           err.status === 401
-            ? "Credenciales incorrectas"
+            ? "Credenciales incorrectas."
             : `Error ${err.status}: ${err.message}`,
         );
       } else {
-        setError("No se pudo conectar con el servidor");
+        setError("No se pudo conectar con el servidor.");
       }
     } finally {
       setLoading(false);
