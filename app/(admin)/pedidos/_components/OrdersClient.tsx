@@ -84,7 +84,7 @@ function StatusSelect({
       value={current}
       onChange={handleChange}
       disabled={loading}
-      className="rounded-lg border border-[--color-border] bg-[--color-surface] px-2 py-1 text-xs text-[--color-text] outline-none transition-colors focus:border-[--color-brand] disabled:opacity-50"
+      className="rounded-lg border border-(--color-border) bg-(--color-surface) px-2 py-1 text-xs text-(--color-text) outline-none transition-colors focus:border-(--color-brand) disabled:opacity-50"
     >
       {ESTADOS.map((e) => (
         <option key={e} value={e}>
@@ -117,7 +117,7 @@ function FilterBar({
         onChange={(e) =>
           onChange({ ...filters, estado: e.target.value as Filters["estado"] })
         }
-        className="rounded-lg border border-[--color-border] bg-[--color-surface-raised] px-3 py-1.5 text-sm text-[--color-text] outline-none focus:border-[--color-brand]"
+        className="rounded-lg border border-(--color-border) bg-(--color-surface-raised) px-3 py-1.5 text-sm text-(--color-text) outline-none focus:border-(--color-brand)"
       >
         <option value="todos">Todos los estados</option>
         {ESTADOS.map((e) => (
@@ -135,7 +135,7 @@ function FilterBar({
             metodo_pago: e.target.value as Filters["metodo_pago"],
           })
         }
-        className="rounded-lg border border-[--color-border] bg-[--color-surface-raised] px-3 py-1.5 text-sm text-[--color-text] outline-none focus:border-[--color-brand]"
+        className="rounded-lg border border-(--color-border) bg-(--color-surface-raised) px-3 py-1.5 text-sm text-(--color-text) outline-none focus:border-(--color-brand)"
       >
         <option value="todos">Todos los pagos</option>
         <option value="online">Online</option>
@@ -146,7 +146,7 @@ function FilterBar({
         type="date"
         value={filters.fecha}
         onChange={(e) => onChange({ ...filters, fecha: e.target.value })}
-        className="rounded-lg border border-[--color-border] bg-[--color-surface-raised] px-3 py-1.5 text-sm text-[--color-text] outline-none focus:border-[--color-brand]"
+        className="rounded-lg border border-(--color-border) bg-(--color-surface-raised) px-3 py-1.5 text-sm text-(--color-text) outline-none focus:border-(--color-brand)"
       />
     </div>
   );
@@ -228,11 +228,11 @@ export default function OrdersClient() {
       )}
 
       {/* Table */}
-      <div className="rounded-[--radius-card] border border-[--color-border] bg-[--color-surface-raised] shadow-sm overflow-hidden">
+      <div className="rounded-(--radius-card) border border-(--color-border) bg-(--color-surface-raised) shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[--color-border] text-left text-xs text-[--color-text-muted]">
+              <tr className="border-b border-(--color-border) text-left text-xs text-(--color-text-muted)">
                 <th className="px-5 py-3 font-medium">Referencia</th>
                 <th className="px-5 py-3 font-medium">Cliente</th>
                 <th className="px-5 py-3 font-medium">Tipo</th>
@@ -248,7 +248,7 @@ export default function OrdersClient() {
                 <tr>
                   <td
                     colSpan={8}
-                    className="px-5 py-10 text-center text-[--color-text-muted]"
+                    className="px-5 py-10 text-center text-(--color-text-muted)"
                   >
                     Cargando…
                   </td>
@@ -257,7 +257,7 @@ export default function OrdersClient() {
                 <tr>
                   <td
                     colSpan={8}
-                    className="px-5 py-10 text-center text-[--color-text-muted]"
+                    className="px-5 py-10 text-center text-(--color-text-muted)"
                   >
                     No hay pedidos
                   </td>
@@ -266,12 +266,12 @@ export default function OrdersClient() {
                 pedidos.map((p) => (
                   <tr
                     key={p.id}
-                    className="border-b border-[--color-border]/50 last:border-0 hover:bg-[--color-surface-muted]/50 transition-colors"
+                    className="border-b border-(--color-border)/50 last:border-0 hover:bg-(--color-surface-muted)/50 transition-colors"
                   >
                     <td className="px-5 py-3 font-mono text-xs">
                       {p.referencia}
                     </td>
-                    <td className="px-5 py-3 text-[--color-text-muted]">
+                    <td className="px-5 py-3 text-(--color-text-muted)">
                       {p.cliente?.nombre ?? p.cliente?.telefono ?? p.cliente_id.slice(0, 8)}
                     </td>
                     <td className="px-5 py-3 capitalize">{p.tipo}</td>
@@ -287,7 +287,7 @@ export default function OrdersClient() {
                         onUpdated={handleEstadoUpdated}
                       />
                     </td>
-                    <td className="px-5 py-3 text-[--color-text-muted]">
+                    <td className="px-5 py-3 text-(--color-text-muted)">
                       {new Date(p.created_at).toLocaleString("es-CO", {
                         month: "short",
                         day: "numeric",
@@ -304,22 +304,22 @@ export default function OrdersClient() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-[--color-border] px-5 py-3">
-            <span className="text-xs text-[--color-text-muted]">
+          <div className="flex items-center justify-between border-t border-(--color-border) px-5 py-3">
+            <span className="text-xs text-(--color-text-muted)">
               {total} pedidos · página {page} de {totalPages}
             </span>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="rounded-lg border border-[--color-border] px-3 py-1 text-xs text-[--color-text] transition-colors hover:bg-[--color-surface-muted] disabled:opacity-40"
+                className="rounded-lg border border-(--color-border) px-3 py-1 text-xs text-(--color-text) transition-colors hover:bg-(--color-surface-muted) disabled:opacity-40"
               >
                 ← Anterior
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="rounded-lg border border-[--color-border] px-3 py-1 text-xs text-[--color-text] transition-colors hover:bg-[--color-surface-muted] disabled:opacity-40"
+                className="rounded-lg border border-(--color-border) px-3 py-1 text-xs text-(--color-text) transition-colors hover:bg-(--color-surface-muted) disabled:opacity-40"
               >
                 Siguiente →
               </button>

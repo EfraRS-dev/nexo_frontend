@@ -72,26 +72,26 @@ function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-md rounded-[--radius-card] border border-[--color-border] bg-[--color-surface-raised] p-6 shadow-xl">
-        <h2 className="mb-4 text-base font-semibold text-[--color-text]">
+      <div className="w-full max-w-md rounded-(--radius-card) border border-(--color-border) bg-(--color-surface-raised) p-6 shadow-xl">
+        <h2 className="mb-4 text-base font-semibold text-(--color-text)">
           {isEdit ? "Editar ítem" : "Nuevo ítem"}
         </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-[--color-text]">
+            <label className="text-xs font-medium text-(--color-text)">
               Nombre
             </label>
             <input
               required
               value={form.nombre}
               onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-              className="h-9 rounded-lg border border-[--color-border] bg-[--color-surface] px-3 text-sm text-[--color-text] outline-none focus:border-[--color-brand]"
+              className="h-9 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 text-sm text-(--color-text) outline-none focus:border-(--color-brand)"
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-[--color-text]">
+            <label className="text-xs font-medium text-(--color-text)">
               Slug (identificador único)
             </label>
             <input
@@ -106,13 +106,13 @@ function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                     .replace(/[^a-z0-9-]/g, ""),
                 })
               }
-              className="h-9 rounded-lg border border-[--color-border] bg-[--color-surface] px-3 text-sm font-mono text-[--color-text] outline-none focus:border-[--color-brand]"
+              className="h-9 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 text-sm font-mono text-(--color-text) outline-none focus:border-(--color-brand)"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-[--color-text]">
+              <label className="text-xs font-medium text-(--color-text)">
                 Precio (COP)
               </label>
               <input
@@ -123,12 +123,12 @@ function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                 onChange={(e) =>
                   setForm({ ...form, precio: Number(e.target.value) })
                 }
-                className="h-9 rounded-lg border border-[--color-border] bg-[--color-surface] px-3 text-sm text-[--color-text] outline-none focus:border-[--color-brand]"
+                className="h-9 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 text-sm text-(--color-text) outline-none focus:border-(--color-brand)"
               />
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-[--color-text]">
+              <label className="text-xs font-medium text-(--color-text)">
                 Categoría
               </label>
               <input
@@ -137,7 +137,7 @@ function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
                   setForm({ ...form, categoria: e.target.value })
                 }
                 placeholder="Hamburguesas…"
-                className="h-9 rounded-lg border border-[--color-border] bg-[--color-surface] px-3 text-sm text-[--color-text] outline-none focus:border-[--color-brand]"
+                className="h-9 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 text-sm text-(--color-text) outline-none focus:border-(--color-brand)"
               />
             </div>
           </div>
@@ -149,9 +149,9 @@ function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
               onChange={(e) =>
                 setForm({ ...form, disponible: e.target.checked })
               }
-              className="h-4 w-4 rounded accent-[--color-brand]"
+              className="h-4 w-4 rounded accent-(--color-brand)"
             />
-            <span className="text-sm text-[--color-text]">Disponible</span>
+            <span className="text-sm text-(--color-text)">Disponible</span>
           </label>
 
           {error && (
@@ -164,14 +164,14 @@ function ItemModal({ item, onClose, onSaved }: ItemModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-[--color-border] px-4 py-2 text-sm text-[--color-text] transition-colors hover:bg-[--color-surface-muted]"
+              className="rounded-lg border border-(--color-border) px-4 py-2 text-sm text-(--color-text) transition-colors hover:bg-(--color-surface-muted)"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-[--color-brand] px-4 py-2 text-sm font-medium text-[--color-brand-foreground] transition-colors hover:bg-[--color-brand-hover] disabled:opacity-50"
+              className="rounded-lg bg-(--color-brand) px-4 py-2 text-sm font-medium text-(--color-brand-foreground) transition-colors hover:bg-(--color-brand-hover) disabled:opacity-50"
             >
               {loading ? "Guardando…" : "Guardar"}
             </button>
@@ -251,12 +251,12 @@ export default function MenuClient() {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-[--color-text-muted]">
+        <p className="text-sm text-(--color-text-muted)">
           {items.length} productos
         </p>
         <button
           onClick={() => setModalItem(null)}
-          className="rounded-lg bg-[--color-brand] px-4 py-2 text-sm font-medium text-[--color-brand-foreground] transition-colors hover:bg-[--color-brand-hover]"
+          className="rounded-lg bg-(--color-brand) px-4 py-2 text-sm font-medium text-(--color-brand-foreground) transition-colors hover:bg-(--color-brand-hover)"
         >
           + Nuevo ítem
         </button>
@@ -271,11 +271,11 @@ export default function MenuClient() {
 
       {/* Menu table */}
       {loading ? (
-        <div className="rounded-[--radius-card] border border-[--color-border] bg-[--color-surface-raised] px-5 py-10 text-center text-sm text-[--color-text-muted] shadow-sm">
+        <div className="rounded-(--radius-card) border border-(--color-border) bg-(--color-surface-raised) px-5 py-10 text-center text-sm text-(--color-text-muted) shadow-sm">
           Cargando menú…
         </div>
       ) : items.length === 0 ? (
-        <div className="rounded-[--radius-card] border border-[--color-border] bg-[--color-surface-raised] px-5 py-10 text-center text-sm text-[--color-text-muted] shadow-sm">
+        <div className="rounded-(--radius-card) border border-(--color-border) bg-(--color-surface-raised) px-5 py-10 text-center text-sm text-(--color-text-muted) shadow-sm">
           No hay ítems en el menú
         </div>
       ) : (
@@ -286,17 +286,17 @@ export default function MenuClient() {
           return (
             <div
               key={cat}
-              className="rounded-[--radius-card] border border-[--color-border] bg-[--color-surface-raised] shadow-sm overflow-hidden"
+              className="rounded-(--radius-card) border border-(--color-border) bg-(--color-surface-raised) shadow-sm overflow-hidden"
             >
-              <div className="border-b border-[--color-border] bg-[--color-surface-muted]/50 px-5 py-2">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-[--color-text-muted]">
+              <div className="border-b border-(--color-border) bg-(--color-surface-muted)/50 px-5 py-2">
+                <h2 className="text-xs font-semibold uppercase tracking-wide text-(--color-text-muted)">
                   {cat}
                 </h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[--color-border] text-left text-xs text-[--color-text-muted]">
+                    <tr className="border-b border-(--color-border) text-left text-xs text-(--color-text-muted)">
                       <th className="px-5 py-2 font-medium">Nombre</th>
                       <th className="px-5 py-2 font-medium">Slug</th>
                       <th className="px-5 py-2 font-medium">Precio</th>
@@ -308,12 +308,12 @@ export default function MenuClient() {
                     {catItems.map((item) => (
                       <tr
                         key={item.id}
-                        className="border-b border-[--color-border]/50 last:border-0 hover:bg-[--color-surface-muted]/40"
+                        className="border-b border-(--color-border)/50 last:border-0 hover:bg-(--color-surface-muted)/40"
                       >
-                        <td className="px-5 py-2.5 font-medium text-[--color-text]">
+                        <td className="px-5 py-2.5 font-medium text-(--color-text)">
                           {item.nombre}
                         </td>
-                        <td className="px-5 py-2.5 font-mono text-xs text-[--color-text-muted]">
+                        <td className="px-5 py-2.5 font-mono text-xs text-(--color-text-muted)">
                           {item.slug}
                         </td>
                         <td className="px-5 py-2.5">{formatCOP(item.precio)}</td>
@@ -336,7 +336,7 @@ export default function MenuClient() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => setModalItem(item)}
-                              className="rounded px-2 py-1 text-xs text-[--color-brand] hover:bg-[--color-brand]/10 transition-colors"
+                              className="rounded px-2 py-1 text-xs text-(--color-brand) hover:bg-(--color-brand)/10 transition-colors"
                             >
                               Editar
                             </button>

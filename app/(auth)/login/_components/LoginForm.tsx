@@ -40,7 +40,7 @@ export default function LoginForm() {
       <div className="flex flex-col gap-1.5">
         <label
           htmlFor="email"
-          className="text-sm font-medium text-[--color-text]"
+          className="text-sm font-medium text-(--color-text)"
         >
           Correo electrónico
         </label>
@@ -51,7 +51,7 @@ export default function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="h-10 rounded-lg border border-[--color-border] bg-[--color-surface] px-3 text-sm text-[--color-text] outline-none transition-colors focus:border-[--color-brand] focus:ring-2 focus:ring-[--color-brand]/20"
+          className="h-10 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 text-sm text-(--color-text) outline-none transition-colors focus:border-(--color-brand) focus:ring-2 focus:ring-(--color-brand)/20"
           placeholder="admin@restaurante.com"
         />
       </div>
@@ -59,7 +59,7 @@ export default function LoginForm() {
       <div className="flex flex-col gap-1.5">
         <label
           htmlFor="password"
-          className="text-sm font-medium text-[--color-text]"
+          className="text-sm font-medium text-(--color-text)"
         >
           Contraseña
         </label>
@@ -70,7 +70,7 @@ export default function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="h-10 rounded-lg border border-[--color-border] bg-[--color-surface] px-3 text-sm text-[--color-text] outline-none transition-colors focus:border-[--color-brand] focus:ring-2 focus:ring-[--color-brand]/20"
+          className="h-10 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 text-sm text-(--color-text) outline-none transition-colors focus:border-(--color-brand) focus:ring-2 focus:ring-(--color-brand)/20"
           placeholder="••••••••"
         />
       </div>
@@ -84,7 +84,7 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="mt-1 h-10 rounded-lg bg-[--color-brand] px-4 text-sm font-medium text-[--color-brand-foreground] transition-colors hover:bg-[--color-brand-hover] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="mt-1 h-10 rounded-lg bg-(--color-brand) px-4 text-sm font-medium text-(--color-brand-foreground) transition-colors hover:bg-(--color-brand-hover) disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? "Iniciando sesión…" : "Iniciar sesión"}
       </button>

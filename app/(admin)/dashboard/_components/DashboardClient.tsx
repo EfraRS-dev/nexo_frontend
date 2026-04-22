@@ -18,10 +18,10 @@ function KpiCard({
   color: string;
 }) {
   return (
-    <div className="rounded-[--radius-card] border border-[--color-border] bg-[--color-surface-raised] p-5 shadow-sm">
-      <p className="text-sm text-[--color-text-muted]">{label}</p>
+    <div className="rounded-(--radius-card) border border-(--color-border) bg-(--color-surface-raised) p-5 shadow-sm">
+      <p className="text-sm text-(--color-text-muted)">{label}</p>
       <p className={`mt-1 text-3xl font-bold ${color}`}>{value}</p>
-      {sub && <p className="mt-1 text-xs text-[--color-text-muted]">{sub}</p>}
+      {sub && <p className="mt-1 text-xs text-(--color-text-muted)">{sub}</p>}
     </div>
   );
 }
@@ -104,8 +104,8 @@ export default function DashboardClient() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[--color-text]">Dashboard</h1>
-        <p className="text-sm text-[--color-text-muted]">
+        <h1 className="text-2xl font-bold text-(--color-text)">Dashboard</h1>
+        <p className="text-sm text-(--color-text-muted)">
           Resumen del día ·{" "}
           {new Date().toLocaleDateString("es-CO", {
             weekday: "long",
@@ -128,13 +128,13 @@ export default function DashboardClient() {
         <KpiCard
           label="Pedidos hoy"
           value={loading ? "—" : totalHoy}
-          color="text-[--color-text]"
+          color="text-(--color-text)"
         />
         <KpiCard
           label="Ingresos online"
           value={loading ? "—" : formatCOP(ingresoHoy)}
           sub="pedidos pagados"
-          color="text-[--color-brand]"
+          color="text-(--color-brand)"
         />
         <KpiCard
           label="Por atender"
@@ -150,32 +150,32 @@ export default function DashboardClient() {
       </div>
 
       {/* Recent orders */}
-      <div className="rounded-[--radius-card] border border-[--color-border] bg-[--color-surface-raised] shadow-sm">
-        <div className="flex items-center justify-between border-b border-[--color-border] px-5 py-3">
-          <h2 className="text-sm font-semibold text-[--color-text]">
+      <div className="rounded-(--radius-card) border border-(--color-border) bg-(--color-surface-raised) shadow-sm">
+        <div className="flex items-center justify-between border-b border-(--color-border) px-5 py-3">
+          <h2 className="text-sm font-semibold text-(--color-text)">
             Pedidos recientes
           </h2>
           <a
             href="/pedidos"
-            className="text-xs text-[--color-brand] hover:underline"
+            className="text-xs text-(--color-brand) hover:underline"
           >
             Ver todos →
           </a>
         </div>
 
         {loading ? (
-          <div className="px-5 py-8 text-center text-sm text-[--color-text-muted]">
+          <div className="px-5 py-8 text-center text-sm text-(--color-text-muted)">
             Cargando…
           </div>
         ) : recientes.length === 0 ? (
-          <div className="px-5 py-8 text-center text-sm text-[--color-text-muted]">
+          <div className="px-5 py-8 text-center text-sm text-(--color-text-muted)">
             Sin pedidos hoy
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[--color-border] text-left text-xs text-[--color-text-muted]">
+                <tr className="border-b border-(--color-border) text-left text-xs text-(--color-text-muted)">
                   <th className="px-5 py-2 font-medium">Referencia</th>
                   <th className="px-5 py-2 font-medium">Tipo</th>
                   <th className="px-5 py-2 font-medium">Pago</th>
@@ -188,7 +188,7 @@ export default function DashboardClient() {
                 {recientes.map((p) => (
                   <tr
                     key={p.id}
-                    className="border-b border-[--color-border]/50 last:border-0 hover:bg-[--color-surface-muted]/50"
+                    className="border-b border-(--color-border)/50 last:border-0 hover:bg-(--color-surface-muted)/50"
                   >
                     <td className="px-5 py-2.5 font-mono text-xs">
                       {p.referencia}
@@ -203,7 +203,7 @@ export default function DashboardClient() {
                         {STATUS_LABELS[p.estado]}
                       </span>
                     </td>
-                    <td className="px-5 py-2.5 text-[--color-text-muted]">
+                    <td className="px-5 py-2.5 text-(--color-text-muted)">
                       {new Date(p.created_at).toLocaleTimeString("es-CO", {
                         hour: "2-digit",
                         minute: "2-digit",
