@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header";
 import AuthGuard from "./_components/AuthGuard";
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function AdminLayout({
       <div className="flex min-h-screen items-start">
         <Sidebar />
         <div className="flex flex-1 flex-col">
+          <Header />
           <main className="flex-1 p-6">{children}</main>
         </div>
       </div>

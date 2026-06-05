@@ -80,6 +80,12 @@ export interface LoginResponse {
   token_type: string;
 }
 
+export interface OperadorMe {
+  email: string;
+  restaurante_id: string;
+  restaurante_nombre: string;
+}
+
 // ── Filters ───────────────────────────────────────────────────────────────
 
 export interface PedidoFilters {

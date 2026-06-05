@@ -3,6 +3,7 @@ import type {
   LoginResponse,
   MenuItem,
   MetodoPago,
+  OperadorMe,
   PaginatedResponse,
   Pedido,
   EstadoPedido,
@@ -72,6 +73,12 @@ export async function login(body: LoginRequest): Promise<LoginResponse> {
     method: "POST",
     body: JSON.stringify(body),
   });
+}
+
+// ── Admin — Perfil ───────────────────────────────────────────────────────────
+
+export async function getMe(): Promise<OperadorMe> {
+  return apiFetch<OperadorMe>("/admin/me");
 }
 
 // ── Admin — Pedidos ────────────────────────────────────────────────────────
