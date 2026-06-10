@@ -36,7 +36,8 @@ async function apiFetch<T>(
 ): Promise<T> {
   const resolvedToken = token ?? getToken();
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    // Content-Type solo cuando hay body: en GET dispararía un preflight CORS
+    ...(options.body ? { "Content-Type": "application/json" } : {}),
     ...(options.headers as Record<string, string>),
   };
   if (resolvedToken) {
@@ -46,14 +47,42 @@ async function apiFetch<T>(
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
 
   if (!res.ok) {
-    const text = await res.text().catch(() => res.statusText);
-    throw new ApiError(res.status, text);
+    // Sesión expirada o token inválido: volver al login
+    if (
+      res.status === 401 &&
+      !path.startsWith("/auth/") &&
+      typeof window !== "undefined"
+    ) {
+      clearToken();
+      window.location.replace("/login");
+    }
+    throw new ApiError(res.status, await extractErrorMessage(res));
   }
 
   // 204 No Content
   if (res.status === 204) return undefined as T;
 
   return res.json() as Promise<T>;
+}
+
+/** Extrae el `detail` de los errores JSON de FastAPI; si no, texto plano. */
+async function extractErrorMessage(res: Response): Promise<string> {
+  const text = await res.text().catch(() => "");
+  if (!text) return res.statusText;
+  try {
+    const data: unknown = JSON.parse(text);
+    if (
+      typeof data === "object" &&
+      data !== null &&
+      "detail" in data &&
+      typeof (data as { detail: unknown }).detail === "string"
+    ) {
+      return (data as { detail: string }).detail;
+    }
+  } catch {
+    // no era JSON
+  }
+  return text;
 }
 
 export class ApiError extends Error {
@@ -93,17 +122,22 @@ export interface GetPedidosParams {
 
 export async function getPedidos(
   params: GetPedidosParams = {},
+  signal?: AbortSignal,
 ): Promise<PaginatedResponse<Pedido>> {
   const qs = new URLSearchParams();
   if (params.estado && params.estado !== "todos") qs.set("estado", params.estado);
   if (params.metodo_pago && params.metodo_pago !== "todos")
     qs.set("metodo_pago", params.metodo_pago);
-  if (params.fecha) qs.set("fecha", params.fecha);
+  if (params.fecha) {
+    qs.set("fecha", params.fecha);
+    // El backend interpreta `fecha` como día local del navegador
+    qs.set("tz_offset", String(new Date().getTimezoneOffset()));
+  }
   if (params.page) qs.set("page", String(params.page));
   if (params.page_size) qs.set("page_size", String(params.page_size));
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiFetch<PaginatedResponse<Pedido>>(`/admin/pedidos${query}`);
+  return apiFetch<PaginatedResponse<Pedido>>(`/admin/pedidos${query}`, { signal });
 }
 
 export async function updatePedidoEstado(

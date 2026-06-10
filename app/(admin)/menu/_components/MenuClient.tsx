@@ -8,17 +8,8 @@ import {
   deleteMenuItem,
   ApiError,
 } from "@/lib/api";
+import { formatCOP } from "@/lib/format";
 import type { MenuItem } from "@/types";
-
-// ── Helpers ────────────────────────────────────────────────────────────────
-
-function formatCOP(amount: number): string {
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 // ── Item modal (create / edit) ────────────────────────────────────────────
 
@@ -217,8 +208,13 @@ export default function MenuClient() {
         disponible: !item.disponible,
       });
       setItems((prev) => prev.map((i) => (i.id === item.id ? updated : i)));
-    } catch {
-      // silently fail
+      setError(null);
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? `No se pudo actualizar "${item.nombre}": ${err.message}`
+          : `No se pudo actualizar "${item.nombre}". Revisa tu conexión.`,
+      );
     }
   }
 
@@ -227,8 +223,13 @@ export default function MenuClient() {
     try {
       await deleteMenuItem(item.id);
       setItems((prev) => prev.filter((i) => i.id !== item.id));
-    } catch {
-      // silently fail
+      setError(null);
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? `No se pudo eliminar "${item.nombre}": ${err.message}`
+          : `No se pudo eliminar "${item.nombre}". Revisa tu conexión.`,
+      );
     }
   }
 

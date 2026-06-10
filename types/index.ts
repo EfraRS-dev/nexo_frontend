@@ -12,20 +12,16 @@ export type TipoPedido = "llevar" | "domicilio";
 
 export type MetodoPago = "online" | "caja";
 
-// ── Backend models ─────────────────────────────────────────────────────────
+// ── Backend API schemas (espejo de PedidoOut/ClienteOut/ItemPedidoOut) ─────
 
 export interface Cliente {
   id: string;
   telefono: string;
   nombre: string | null;
-  direccion: string | null;
-  created_at: string;
 }
 
 export interface Pedido {
   id: string;
-  cliente_id: string;
-  restaurante_id: string;
   referencia: string;
   estado: EstadoPedido;
   tipo: TipoPedido;
@@ -33,20 +29,16 @@ export interface Pedido {
   metodo_pago: MetodoPago;
   total: number; // COP
   created_at: string;
-  // Populated by backend join (admin endpoint)
-  cliente?: Cliente;
-  items?: ItemPedido[];
+  cliente: Cliente;
+  items: ItemPedido[];
 }
 
 export interface ItemPedido {
-  id: string;
-  pedido_id: string;
   producto_id: string;
   cantidad: number;
-  modificadores: Record<string, { sin?: string[] }> | null;
   precio_unitario: number; // COP
-  // Populated by backend join
-  nombre?: string;
+  modificadores: Record<string, { sin?: string[] }> | null;
+  nombre: string | null; // null si el producto fue eliminado del menú
 }
 
 export interface MenuItem {
@@ -84,14 +76,4 @@ export interface OperadorMe {
   email: string;
   restaurante_id: string;
   restaurante_nombre: string;
-}
-
-// ── Filters ───────────────────────────────────────────────────────────────
-
-export interface PedidoFilters {
-  estado?: EstadoPedido | "todos";
-  metodo_pago?: MetodoPago | "todos";
-  fecha?: string; // ISO date string YYYY-MM-DD
-  page?: number;
-  page_size?: number;
 }

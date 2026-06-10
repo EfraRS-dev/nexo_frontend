@@ -1,45 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Fragment, useEffect, useRef, useState, useCallback } from "react";
 import { getPedidos, updatePedidoEstado, ApiError } from "@/lib/api";
+import { ESTADOS, STATUS_LABELS, STATUS_COLORS } from "@/lib/constants";
+import { formatCOP, localDateStr } from "@/lib/format";
 import type { EstadoPedido, MetodoPago, Pedido } from "@/types";
-
-// ── Constants ──────────────────────────────────────────────────────────────
-
-const ESTADOS: EstadoPedido[] = [
-  "pendiente",
-  "confirmado",
-  "pagado",
-  "preparando",
-  "en_camino",
-  "entregado",
-];
-
-const STATUS_LABELS: Record<EstadoPedido, string> = {
-  pendiente: "Pendiente",
-  confirmado: "Confirmado",
-  pagado: "Pagado",
-  preparando: "Preparando",
-  en_camino: "En camino",
-  entregado: "Entregado",
-};
-
-const STATUS_COLORS: Record<EstadoPedido, string> = {
-  pendiente: "bg-yellow-100 text-yellow-800",
-  confirmado: "bg-blue-100 text-blue-800",
-  pagado: "bg-emerald-100 text-emerald-800",
-  preparando: "bg-orange-100 text-orange-800",
-  en_camino: "bg-purple-100 text-purple-800",
-  entregado: "bg-green-100 text-green-800",
-};
-
-function formatCOP(amount: number): string {
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 // ── StatusBadge ────────────────────────────────────────────────────────────
 
@@ -59,10 +24,12 @@ function StatusSelect({
   referencia,
   current,
   onUpdated,
+  onError,
 }: {
   referencia: string;
   current: EstadoPedido;
   onUpdated: (referencia: string, estado: EstadoPedido) => void;
+  onError: (message: string) => void;
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -72,8 +39,12 @@ function StatusSelect({
     try {
       await updatePedidoEstado(referencia, newEstado);
       onUpdated(referencia, newEstado);
-    } catch {
-      // silently fail; user can retry
+    } catch (err) {
+      onError(
+        err instanceof ApiError
+          ? `No se pudo actualizar ${referencia}: ${err.message}`
+          : `No se pudo actualizar ${referencia}. Revisa tu conexión.`,
+      );
     } finally {
       setLoading(false);
     }
@@ -92,6 +63,43 @@ function StatusSelect({
         </option>
       ))}
     </select>
+  );
+}
+
+// ── Order detail (expanded row) ────────────────────────────────────────────
+
+function OrderDetail({ pedido }: { pedido: Pedido }) {
+  return (
+    <div className="flex flex-col gap-2 px-5 py-3 text-xs">
+      <ul className="flex flex-col gap-1">
+        {pedido.items.length === 0 ? (
+          <li className="text-(--color-text-muted)">Sin detalle de items</li>
+        ) : (
+          pedido.items.map((item, idx) => {
+            const sinMods = Object.entries(item.modificadores ?? {})
+              .filter(([, mod]) => mod.sin?.length)
+              .map(([nombre, mod]) => `${nombre}: sin ${mod.sin!.join(", ")}`);
+            return (
+              <li key={idx} className="text-(--color-text)">
+                <span className="font-medium">
+                  {item.cantidad} × {item.nombre ?? item.producto_id}
+                </span>{" "}
+                <span className="text-(--color-text-muted)">
+                  · {formatCOP(item.precio_unitario)} c/u
+                  {sinMods.length > 0 && ` · ${sinMods.join(" · ")}`}
+                </span>
+              </li>
+            );
+          })
+        )}
+      </ul>
+      <div className="flex flex-wrap gap-x-6 gap-y-1 text-(--color-text-muted)">
+        {pedido.cliente.telefono && <span>📞 {pedido.cliente.telefono}</span>}
+        {pedido.tipo === "domicilio" && (
+          <span>📍 {pedido.direccion_entrega ?? "Sin dirección registrada"}</span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -155,57 +163,67 @@ function FilterBar({
 // ── Main component ─────────────────────────────────────────────────────────
 
 export default function OrdersClient() {
-  const todayStr = new Date().toISOString().slice(0, 10);
-
   const [filters, setFilters] = useState<Filters>({
     estado: "todos",
     metodo_pago: "todos",
-    fecha: todayStr,
+    fecha: localDateStr(),
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const PAGE_SIZE = 20;
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchOrders = useCallback(async () => {
-    setLoading(true);
+    // Aborta el fetch anterior: evita que una respuesta vieja pise una nueva
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
-      const res = await getPedidos({
-        estado: filters.estado !== "todos" ? filters.estado : undefined,
-        metodo_pago:
-          filters.metodo_pago !== "todos" ? filters.metodo_pago : undefined,
-        fecha: filters.fecha || undefined,
-        page,
-        page_size: PAGE_SIZE,
-      });
+      const res = await getPedidos(
+        {
+          estado: filters.estado !== "todos" ? filters.estado : undefined,
+          metodo_pago:
+            filters.metodo_pago !== "todos" ? filters.metodo_pago : undefined,
+          fecha: filters.fecha || undefined,
+          page,
+          page_size: PAGE_SIZE,
+        },
+        controller.signal,
+      );
       setPedidos(res.items);
       setTotal(res.total);
       setError(null);
     } catch (err) {
+      if (controller.signal.aborted) return; // petición reemplazada
       if (err instanceof ApiError) {
         setError(`Error ${err.status}: ${err.message}`);
       } else {
         setError("No se pudo conectar con el servidor");
       }
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, [filters, page]);
 
   useEffect(() => {
     fetchOrders();
-    // Polling cada 30 s (RF-24)
-    const id = setInterval(fetchOrders, 30_000);
+    // Polling cada 30 s (RF-24); en pausa mientras la pestaña está oculta
+    const id = setInterval(() => {
+      if (!document.hidden) fetchOrders();
+    }, 30_000);
     return () => clearInterval(id);
   }, [fetchOrders]);
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
+  function handleFiltersChange(f: Filters) {
+    setFilters(f);
     setPage(1);
-  }, [filters]);
+  }
 
   function handleEstadoUpdated(referencia: string, estado: EstadoPedido) {
     setPedidos((prev) =>
@@ -218,7 +236,7 @@ export default function OrdersClient() {
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <FilterBar filters={filters} onChange={setFilters} />
+      <FilterBar filters={filters} onChange={handleFiltersChange} />
 
       {/* Error */}
       {error && (
@@ -264,38 +282,56 @@ export default function OrdersClient() {
                 </tr>
               ) : (
                 pedidos.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="border-b border-(--color-border)/50 last:border-0 hover:bg-(--color-surface-muted)/50 transition-colors"
-                  >
-                    <td className="px-5 py-3 font-mono text-xs">
-                      {p.referencia}
-                    </td>
-                    <td className="px-5 py-3 text-(--color-text-muted)">
-                      {p.cliente?.nombre ?? p.cliente?.telefono ?? p.cliente_id.slice(0, 8)}
-                    </td>
-                    <td className="px-5 py-3 capitalize">{p.tipo}</td>
-                    <td className="px-5 py-3 capitalize">{p.metodo_pago}</td>
-                    <td className="px-5 py-3">{formatCOP(p.total)}</td>
-                    <td className="px-5 py-3">
-                      <StatusBadge estado={p.estado} />
-                    </td>
-                    <td className="px-5 py-3">
-                      <StatusSelect
-                        referencia={p.referencia}
-                        current={p.estado}
-                        onUpdated={handleEstadoUpdated}
-                      />
-                    </td>
-                    <td className="px-5 py-3 text-(--color-text-muted)">
-                      {new Date(p.created_at).toLocaleString("es-CO", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </td>
-                  </tr>
+                  <Fragment key={p.id}>
+                    <tr
+                      onClick={() =>
+                        setExpandedId((prev) => (prev === p.id ? null : p.id))
+                      }
+                      className="cursor-pointer border-b border-(--color-border)/50 last:border-0 hover:bg-(--color-surface-muted)/50 transition-colors"
+                    >
+                      <td className="px-5 py-3 font-mono text-xs">
+                        <span className="mr-1.5 inline-block text-(--color-text-muted)">
+                          {expandedId === p.id ? "▾" : "▸"}
+                        </span>
+                        {p.referencia}
+                      </td>
+                      <td className="px-5 py-3 text-(--color-text-muted)">
+                        {p.cliente.nombre || p.cliente.telefono || "—"}
+                      </td>
+                      <td className="px-5 py-3 capitalize">{p.tipo}</td>
+                      <td className="px-5 py-3 capitalize">{p.metodo_pago}</td>
+                      <td className="px-5 py-3">{formatCOP(p.total)}</td>
+                      <td className="px-5 py-3">
+                        <StatusBadge estado={p.estado} />
+                      </td>
+                      <td
+                        className="px-5 py-3"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <StatusSelect
+                          referencia={p.referencia}
+                          current={p.estado}
+                          onUpdated={handleEstadoUpdated}
+                          onError={setError}
+                        />
+                      </td>
+                      <td className="px-5 py-3 text-(--color-text-muted)">
+                        {new Date(p.created_at).toLocaleString("es-CO", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                    </tr>
+                    {expandedId === p.id && (
+                      <tr className="border-b border-(--color-border)/50 last:border-0 bg-(--color-surface-muted)/30">
+                        <td colSpan={8}>
+                          <OrderDetail pedido={p} />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))
               )}
             </tbody>

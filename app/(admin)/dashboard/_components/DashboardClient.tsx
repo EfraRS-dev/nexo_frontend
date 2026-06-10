@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import { getPedidos, ApiError } from "@/lib/api";
-import type { Pedido, EstadoPedido } from "@/types";
+import { STATUS_LABELS, STATUS_COLORS } from "@/lib/constants";
+import { formatCOP, localDateStr } from "@/lib/format";
+import type { Pedido } from "@/types";
 
 // ── KPI card ──────────────────────────────────────────────────────────────
 
@@ -26,47 +29,21 @@ function KpiCard({
   );
 }
 
-// ── Recent orders row ─────────────────────────────────────────────────────
-
-const STATUS_LABELS: Record<EstadoPedido, string> = {
-  pendiente: "Pendiente",
-  confirmado: "Confirmado",
-  pagado: "Pagado",
-  preparando: "Preparando",
-  en_camino: "En camino",
-  entregado: "Entregado",
-};
-
-const STATUS_COLORS: Record<EstadoPedido, string> = {
-  pendiente: "bg-yellow-100 text-yellow-800",
-  confirmado: "bg-blue-100 text-blue-800",
-  pagado: "bg-emerald-100 text-emerald-800",
-  preparando: "bg-orange-100 text-orange-800",
-  en_camino: "bg-purple-100 text-purple-800",
-  entregado: "bg-green-100 text-green-800",
-};
-
-function formatCOP(amount: number): string {
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 // ── Main dashboard component ──────────────────────────────────────────────
 
 export default function DashboardClient() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [totalHoy, setTotalHoy] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = localDateStr();
 
   const fetchData = useCallback(async () => {
     try {
       const res = await getPedidos({ fecha: todayStr, page_size: 100 });
       setPedidos(res.items);
+      setTotalHoy(res.total);
       setError(null);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -81,13 +58,16 @@ export default function DashboardClient() {
 
   useEffect(() => {
     fetchData();
-    // Polling cada 30 s (RF-24)
-    const id = setInterval(fetchData, 30_000);
+    // Polling cada 30 s (RF-24); en pausa mientras la pestaña está oculta
+    const id = setInterval(() => {
+      if (!document.hidden) fetchData();
+    }, 30_000);
     return () => clearInterval(id);
   }, [fetchData]);
 
   // ── KPIs ────────────────────────────────────────────────────────────────
-  const totalHoy = pedidos.length;
+  // Nota: salvo totalHoy (que usa res.total), los KPIs se derivan de los
+  // primeros 100 pedidos del día (page_size máx. del backend).
   const ingresoHoy = pedidos
     .filter((p) => p.metodo_pago === "online" && p.estado !== "pendiente")
     .reduce((acc, p) => acc + p.total, 0);
@@ -155,12 +135,12 @@ export default function DashboardClient() {
           <h2 className="text-sm font-semibold text-(--color-text)">
             Pedidos recientes
           </h2>
-          <a
+          <Link
             href="/pedidos"
             className="text-xs text-(--color-brand) hover:underline"
           >
             Ver todos →
-          </a>
+          </Link>
         </div>
 
         {loading ? (

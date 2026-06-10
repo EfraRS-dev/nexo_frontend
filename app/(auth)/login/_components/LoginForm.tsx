@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { login, setToken, ApiError } from "@/lib/api";
+import { login, getToken, setToken, ApiError } from "@/lib/api";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -10,6 +10,11 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Si ya hay sesión, ir directo al panel
+  useEffect(() => {
+    if (getToken()) router.replace("/dashboard");
+  }, [router]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
