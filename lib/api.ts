@@ -7,6 +7,8 @@ import type {
   PaginatedResponse,
   Pedido,
   EstadoPedido,
+  Restaurante,
+  RestauranteUpdate,
 } from "@/types";
 
 const API_BASE =
@@ -108,6 +110,21 @@ export async function login(body: LoginRequest): Promise<LoginResponse> {
 
 export async function getMe(): Promise<OperadorMe> {
   return apiFetch<OperadorMe>("/admin/me");
+}
+
+// ── Admin — Restaurante ──────────────────────────────────────────────────────
+
+export async function getRestaurante(): Promise<Restaurante> {
+  return apiFetch<Restaurante>("/admin/restaurante");
+}
+
+export async function updateRestaurante(
+  data: RestauranteUpdate,
+): Promise<Restaurante> {
+  return apiFetch<Restaurante>("/admin/restaurante", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
 }
 
 // ── Admin — Pedidos ────────────────────────────────────────────────────────

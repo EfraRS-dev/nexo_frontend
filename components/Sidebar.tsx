@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: "⊞" },
   { href: "/pedidos", label: "Pedidos", icon: "📋" },
   { href: "/menu", label: "Menú", icon: "🍽" },
+  { href: "/restaurante", label: "Mi restaurante", icon: "🏪" },
 ] as const;
 
 export default function Sidebar() {

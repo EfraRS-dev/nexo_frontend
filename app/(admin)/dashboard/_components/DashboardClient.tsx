@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { getPedidos, ApiError } from "@/lib/api";
+import { getPedidos, getRestaurante, ApiError } from "@/lib/api";
 import { STATUS_LABELS, STATUS_COLORS } from "@/lib/constants";
 import { formatCOP, localDateStr } from "@/lib/format";
+import { restauranteCompleto } from "@/lib/restaurante";
 import type { Pedido } from "@/types";
 
 // ── KPI card ──────────────────────────────────────────────────────────────
@@ -36,6 +37,7 @@ export default function DashboardClient() {
   const [totalHoy, setTotalHoy] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [perfil, setPerfil] = useState<{ porcentaje: number; faltantes: string[] } | null>(null);
 
   const todayStr = localDateStr();
 
@@ -64,6 +66,23 @@ export default function DashboardClient() {
     }, 30_000);
     return () => clearInterval(id);
   }, [fetchData]);
+
+  // Nudge de perfil incompleto (una sola vez; degrada en silencio si falla)
+  useEffect(() => {
+    let activo = true;
+    getRestaurante()
+      .then((r) => {
+        if (!activo) return;
+        const c = restauranteCompleto(r);
+        setPerfil(c.completo ? null : { porcentaje: c.porcentaje, faltantes: c.faltantes });
+      })
+      .catch(() => {
+        /* sin banner si no se pudo cargar */
+      });
+    return () => {
+      activo = false;
+    };
+  }, []);
 
   // ── KPIs ────────────────────────────────────────────────────────────────
   // Nota: salvo totalHoy (que usa res.total), los KPIs se derivan de los
@@ -101,6 +120,20 @@ export default function DashboardClient() {
         <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
           {error}
         </div>
+      )}
+
+      {/* Nudge de perfil incompleto */}
+      {perfil && (
+        <Link
+          href="/restaurante"
+          className="flex items-center justify-between gap-3 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 transition-colors hover:bg-amber-100"
+        >
+          <span>
+            Completa la información de tu restaurante ({perfil.porcentaje}%) — falta:{" "}
+            {perfil.faltantes.join(", ")}.
+          </span>
+          <span className="shrink-0 font-medium">Completar →</span>
+        </Link>
       )}
 
       {/* KPI grid */}

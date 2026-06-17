@@ -77,3 +77,41 @@ export interface OperadorMe {
   restaurante_id: string;
   restaurante_nombre: string;
 }
+
+// ── Restaurante (tenant) — espejo de RestauranteOut ──────────────────────────
+
+export interface RedesSociales {
+  instagram?: string;
+  facebook?: string;
+}
+
+export interface Restaurante {
+  // Asignados por la plataforma (solo lectura en la UI)
+  id: string;
+  nombre: string;
+  numero_whatsapp: string;
+  prefijo: string;
+  activo: boolean;
+  // Campos de config_json (aplanados); null si el tenant no los ha definido
+  descripcion: string | null;
+  direccion: string | null;
+  horario: string | null;
+  email: string | null;
+  telefono_contacto: string | null;
+  redes_sociales: RedesSociales | null;
+  metodos_pago: MetodoPago[] | null;
+  zonas_cobertura: string[] | null;
+}
+
+/** Campos editables vía PATCH /admin/restaurante (cualquier subconjunto). */
+export type RestauranteUpdate = Partial<{
+  nombre: string;
+  descripcion: string | null;
+  direccion: string | null;
+  horario: string | null;
+  email: string | null;
+  telefono_contacto: string | null;
+  redes_sociales: RedesSociales | null;
+  metodos_pago: MetodoPago[] | null;
+  zonas_cobertura: string[] | null;
+}>;
